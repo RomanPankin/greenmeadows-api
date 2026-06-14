@@ -119,3 +119,11 @@ cart state itself lives on the server, and only the *pointer* to it survives the
 - **Single project, folders not layers** — pragmatic for the scope; a larger system would split
   Domain/Application/Infrastructure into projects to enforce dependency direction.
 - **Tax** is a flat configurable rate on the subtotal — no per-region or per-product tax rules.
+
+## What I'd do differently with more time
+
+- Add concurrency handling (rowversion) so two tabs editing one cart can't silently clobber each other.
+- Checkout flow that atomically decrements stock inside a transaction.
+- Promo codes and a published OpenAPI contract for typed client generation.
+- A "cart not found" recovery (auto-create) so a stale localStorage id self-heals on the client.
+- Move DB credentials out of `appsettings.Development.json` into user-secrets / environment variables.
