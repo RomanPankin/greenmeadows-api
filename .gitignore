@@ -1,0 +1,16 @@
+# Build output
+bin/
+obj/
+
+# IDE / editor
+.vs/
+.vscode/
+.idea/
+*.user
+
+# OS
+.DS_Store
+
+# Local secrets / overrides
+appsettings.*.local.json
+*.env
