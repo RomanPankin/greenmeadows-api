@@ -11,8 +11,8 @@ namespace GreenMeadows.Store.Tests;
 /// </summary>
 public class CartEndpointsTests(StoreApiFactory factory) : IClassFixture<StoreApiFactory>
 {
-    private static readonly Guid SpadeId = new("11111111-1111-1111-1111-111111111111");
-    private static readonly Guid ShearsId = new("55555555-5555-5555-5555-555555555555"); // stock 3
+    private static readonly Guid AuroraId = new("11111111-1111-1111-1111-111111111111");
+    private static readonly Guid EonMiniId = new("55555555-5555-5555-5555-555555555555"); // stock 3
 
     private readonly HttpClient _client = factory.CreateClient();
 
@@ -23,7 +23,7 @@ public class CartEndpointsTests(StoreApiFactory factory) : IClassFixture<StoreAp
 
         products.Should().NotBeNull();
         products!.Should().HaveCountGreaterThan(0);
-        products.Should().Contain(p => p.Id == SpadeId);
+        products.Should().Contain(p => p.Id == AuroraId);
     }
 
     [Fact]
@@ -51,13 +51,13 @@ public class CartEndpointsTests(StoreApiFactory factory) : IClassFixture<StoreAp
         var cartId = await CreateCartAsync();
 
         var add = await _client.PostAsJsonAsync($"/api/v1/carts/{cartId}/items",
-            new AddCartItemRequest { ProductId = SpadeId, Quantity = 2 });
+            new AddCartItemRequest { ProductId = AuroraId, Quantity = 2 });
         add.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var cart = await _client.GetFromJsonAsync<CartDto>($"/api/v1/carts/{cartId}");
-        cart!.Items.Should().ContainSingle(i => i.ProductId == SpadeId && i.Quantity == 2);
-        cart.Subtotal.Should().Be(49.98m);
-        cart.Total.Should().Be(59.98m);
+        cart!.Items.Should().ContainSingle(i => i.ProductId == AuroraId && i.Quantity == 2);
+        cart.Subtotal.Should().Be(1798.00m);
+        cart.Total.Should().Be(2157.60m);   // + 20% tax (pinned in StoreApiFactory)
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public class CartEndpointsTests(StoreApiFactory factory) : IClassFixture<StoreAp
         var cartId = await CreateCartAsync();
 
         var response = await _client.PostAsJsonAsync($"/api/v1/carts/{cartId}/items",
-            new AddCartItemRequest { ProductId = ShearsId, Quantity = 9 });
+            new AddCartItemRequest { ProductId = EonMiniId, Quantity = 9 });
 
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
         var problem = await response.Content.ReadFromJsonAsync<ProblemPayload>();
@@ -80,7 +80,7 @@ public class CartEndpointsTests(StoreApiFactory factory) : IClassFixture<StoreAp
         var cartId = await CreateCartAsync();
 
         var response = await _client.PostAsJsonAsync($"/api/v1/carts/{cartId}/items",
-            new AddCartItemRequest { ProductId = SpadeId, Quantity = 0 });
+            new AddCartItemRequest { ProductId = AuroraId, Quantity = 0 });
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -98,9 +98,9 @@ public class CartEndpointsTests(StoreApiFactory factory) : IClassFixture<StoreAp
     {
         var cartId = await CreateCartAsync();
         await _client.PostAsJsonAsync($"/api/v1/carts/{cartId}/items",
-            new AddCartItemRequest { ProductId = SpadeId, Quantity = 1 });
+            new AddCartItemRequest { ProductId = AuroraId, Quantity = 1 });
 
-        var response = await _client.DeleteAsync($"/api/v1/carts/{cartId}/items/{SpadeId}");
+        var response = await _client.DeleteAsync($"/api/v1/carts/{cartId}/items/{AuroraId}");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var cart = await response.Content.ReadFromJsonAsync<CartDto>();
